@@ -14,20 +14,24 @@ class GA(object):
                 temp += str(random.randint(0, 1))
             self.pop_list.append([temp, 0])
 
-        for _ in range(10000):
+        for i in range(1000):
             self.fitness_list = self.fitness()
             self.selection()
             if self.result:
-                print(self.result)
+                print("result : ", self.result)
                 break
-            for i in range(int(self.pop_size * 0.8)):
-                pos1 = random.randrange(0, len(self.pop_list))
-                pos2 = random.randrange(0, len(self.pop_list))
-                self.pop_list[pos1], self.pop_list[pos2] = self.cross_over(self.pop_list[pos1], self.pop_list[pos2])
+            for i in range(int(len(self.pop_list) * 0.7)):
+                pos1 = random.randint(0, len(self.pop_list))
+                pos2 = random.randint(0, len(self.pop_list))
+                a1 = self.pop_list[pos1][0]
+                a2 = self.pop_list[pos2][0]
+                self.pop_list[pos1][0], self.pop_list[pos2][0] = self.cross_over(self.pop_list[pos1][0], self.pop_list[pos2][0])
 
-            for i in range(int(self.pop_size * 0.2)):
-                pos = random.randrange(0, len(self.pop_list))
-                self.mutation(self.pop_list[pos])
+            for i in range(int(self.pop_size * 0.3)):
+                #pos = random.randrange(0, len(self.pop_list))
+                pos = 3
+                self.div_mutation(self.pop_list[pos][0])
+            print("iteration : ", i)
 
     def fitness(self):
         fitness_list = []
@@ -36,7 +40,7 @@ class GA(object):
             e = equation(decimal)
             fitness_list.append(e)
             self.pop_list[i][1] = e
-            if e <= 0.01 :
+            if abs(e) <= 0.01 :
                 self.result = self.pop_list[i]
 
         return fitness_list
@@ -50,7 +54,6 @@ class GA(object):
         count = 0
         for j in range(len(self.pop_list)):
             if self.pop_list[j - count][1] in remove_list:
-                a = self.pop_list[j - count][1]
                 del self.pop_list[j - count]
                 count += 1
 
@@ -58,12 +61,25 @@ class GA(object):
         div1 = 4
         div2 = 12
         temp_pop1 = pop1[:div1] + pop2[div1:div2] + pop1[div2:]
-        temp_pop2 = pop1[:div2] + pop2[div2:div1] + pop1[div1:]
+        temp_pop2 = pop2[:div1] + pop1[div1:div2] + pop2[div2:]
         return temp_pop1, temp_pop2
 
-    def mutation(self, old_populations, num):
-        pass
+    def div_mutation(self, pop):
+        # div1 = random.randrange(0, pop_len)
+        # div2 = random.randrange(0, pop_len)
+        div1 = 4
+        div2 = 12
+        if div1 > div2:
+            self.mutation(div1, div2, pop)
+        elif div2 > div1:
+            self.mutation(div2, div1, pop)
 
+    def mutation(self, div1, div2, pop):
+        temp = ''
+        for i in range(div1 - div2):
+            temp += str(random.randint(0, 1))
+        temp_pop1 = pop[:div1] + temp + pop[div2:]
+        self.pop_list.append([temp_pop1, 0])
 
 def equation(x):
     return 9 * x ** 5 - 194.7 * x ** 4 + 1680.1 * x ** 3 - 7227.94 * x ** 2 + 15501.2 * x - 13257.2
