@@ -7,15 +7,28 @@ class GA(object):
     def __init__(self, pop_size):
         self.pop_size = pop_size
         self.pop_list = []
+        self.result = None
         for _ in range(pop_size):
             temp = ''
             for _ in range(pop_len):
                 temp += str(random.randint(0, 1))
             self.pop_list.append([temp, 0])
 
-        self.fitness_list = self.fitness()
-        self.selection()
-        a = 2
+        for _ in range(10000):
+            self.fitness_list = self.fitness()
+            self.selection()
+            if self.result:
+                print(self.result)
+                break
+            for i in range(int(self.pop_size * 0.8)):
+                pos1 = random.randrange(0, len(self.pop_list))
+                pos2 = random.randrange(0, len(self.pop_list))
+                self.pop_list[pos1], self.pop_list[pos2] = self.cross_over(self.pop_list[pos1], self.pop_list[pos2])
+
+            for i in range(int(self.pop_size * 0.2)):
+                pos = random.randrange(0, len(self.pop_list))
+                self.mutation(self.pop_list[pos])
+
     def fitness(self):
         fitness_list = []
         for i in range(len(self.pop_list)):
@@ -23,6 +36,8 @@ class GA(object):
             e = equation(decimal)
             fitness_list.append(e)
             self.pop_list[i][1] = e
+            if e <= 0.01 :
+                self.result = self.pop_list[i]
 
         return fitness_list
 
@@ -39,8 +54,12 @@ class GA(object):
                 del self.pop_list[j - count]
                 count += 1
 
-    def cross_over(self):
-        pass
+    def cross_over(self, pop1, pop2):
+        div1 = 4
+        div2 = 12
+        temp_pop1 = pop1[:div1] + pop2[div1:div2] + pop1[div2:]
+        temp_pop2 = pop1[:div2] + pop2[div2:div1] + pop1[div1:]
+        return temp_pop1, temp_pop2
 
     def mutation(self, old_populations, num):
         pass
