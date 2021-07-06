@@ -14,24 +14,28 @@ class GA(object):
                 temp += str(random.randint(0, 1))
             self.pop_list.append([temp, 0])
 
-        for i in range(1000):
+        for j in range(1000):
             self.fitness_list = self.fitness()
             self.selection()
             if self.result:
-                print("result : ", self.result)
+                print("result : ", bin_to_decimal(self.result[0]))
                 break
-            for i in range(int(len(self.pop_list) * 0.7)):
-                pos1 = random.randint(0, len(self.pop_list))
-                pos2 = random.randint(0, len(self.pop_list))
-                a1 = self.pop_list[pos1][0]
-                a2 = self.pop_list[pos2][0]
+            for _ in range(int(len(self.pop_list) * 0.7)):
+                pos1 = random.randint(0, len(self.pop_list) - 1)
+                pos2 = random.randint(0, len(self.pop_list) - 1)
                 self.pop_list[pos1][0], self.pop_list[pos2][0] = self.cross_over(self.pop_list[pos1][0], self.pop_list[pos2][0])
-
-            for i in range(int(self.pop_size * 0.3)):
-                #pos = random.randrange(0, len(self.pop_list))
-                pos = 3
-                self.div_mutation(self.pop_list[pos][0])
-            print("iteration : ", i)
+            for _ in range(int(self.pop_size * 0.3)):
+                pos = random.randint(0, len(self.pop_list) - 1)
+                try:
+                    self.div_mutation(self.pop_list[pos][0])
+                except:
+                    print("error under div mutation")
+            print("iteration : ", j)
+            print("min fitness : ", min(self.fitness_list))
+            for q in range(len(self.pop_list)):
+                if min(self.fitness_list) == self.pop_list[q][1]:
+                    print("min number : ", bin_to_decimal(self.pop_list[q][0]))
+                    break
 
     def fitness(self):
         fitness_list = []
@@ -40,7 +44,7 @@ class GA(object):
             e = equation(decimal)
             fitness_list.append(e)
             self.pop_list[i][1] = e
-            if abs(e) <= 0.01 :
+            if abs(e) <= 0.25 :
                 self.result = self.pop_list[i]
 
         return fitness_list
@@ -65,28 +69,27 @@ class GA(object):
         return temp_pop1, temp_pop2
 
     def div_mutation(self, pop):
-        # div1 = random.randrange(0, pop_len)
-        # div2 = random.randrange(0, pop_len)
-        div1 = 4
-        div2 = 12
-        if div1 > div2:
-            self.mutation(div1, div2, pop)
-        elif div2 > div1:
-            self.mutation(div2, div1, pop)
+        try:
+            # div1 = random.randint(0, pop_len - 1)
+            # div2 = random.randint(0, pop_len - 1)
+            div1 = 2
+            div2 = 10
+            if div2 > div1:
+                self.mutation(div1, div2, pop)
+            elif div1 > div2:
+                self.mutation(div2, div1, pop)
+        except:
+            print("error div_mutation")
 
     def mutation(self, div1, div2, pop):
         temp = ''
-        for i in range(div1 - div2):
+        for i in range(div2 - div1):
             temp += str(random.randint(0, 1))
         temp_pop1 = pop[:div1] + temp + pop[div2:]
         self.pop_list.append([temp_pop1, 0])
 
 def equation(x):
-    return 9 * x ** 5 - 194.7 * x ** 4 + 1680.1 * x ** 3 - 7227.94 * x ** 2 + 15501.2 * x - 13257.2
-
-def decimal_to_bin(decimal):
-    bin = decimal
-    return bin
+    return abs(9 * x ** 5 - 194.7 * x ** 4 + 1680.1 * x ** 3 - 7227.94 * x ** 2 + 15501.2 * x - 13257.2)
 
 def bin_to_decimal(bin):
     temp1 = 0
