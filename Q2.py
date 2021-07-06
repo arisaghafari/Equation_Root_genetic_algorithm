@@ -14,7 +14,7 @@ class GA(object):
             self.pop_list.append([temp, 0])
 
         self.fitness_list = self.fitness()
-        #self.selection()
+        self.selection()
         a = 2
     def fitness(self):
         fitness_list = []
@@ -29,17 +29,16 @@ class GA(object):
     def selection(self):  # using generation gap approach
         remove_num = int(self.pop_size * 0.3)
         remove_list = []
-        fitness_temp = self.fitness_list
-        fitness_temp.sort()
+        self.fitness_list.sort()
         for i in range(remove_num):
-            remove_list.append(fitness_temp[len(fitness_temp) - 1 - i])
-
+            remove_list.append(self.fitness_list[len(self.fitness_list) - 1 - i])
         count = 0
-        for j in range(len(self.fitness_list)):
-            if self.fitness_list[j] in remove_list:
-                del self.fitness_list[j - count]
+        for j in range(len(self.pop_list)):
+            if self.pop_list[j - count][1] in remove_list:
+                a = self.pop_list[j - count][1]
                 del self.pop_list[j - count]
                 count += 1
+
     def cross_over(self):
         pass
 
